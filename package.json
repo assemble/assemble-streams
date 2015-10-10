@@ -1,5 +1,5 @@
 {
-  "name": "assemble-stream",
+  "name": "assemble-streams",
   "description": "Assemble plugin that adds convenience methods for working with streams, like `toStream`, which pushes a view collection into a vinyl stream.",
   "version": "0.1.0",
   "homepage": "https://github.com/jonschlinkert/assemble-streams",

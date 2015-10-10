@@ -1,4 +1,4 @@
-# assemble-stream [![NPM version](https://badge.fury.io/js/assemble-stream.svg)](http://badge.fury.io/js/assemble-stream)
+# assemble-streams [![NPM version](https://badge.fury.io/js/assemble-streams.svg)](http://badge.fury.io/js/assemble-streams)
 
 > Assemble plugin that adds convenience methods for working with streams, like `toStream`, which pushes a view collection into a vinyl stream.
 
@@ -7,7 +7,7 @@
 Install with [npm](https://www.npmjs.com/)
 
 ```sh
-$ npm i assemble-stream --save
+$ npm i assemble-streams --save
 ```
 
 ## Usage
@@ -16,7 +16,7 @@ This plugin can be used with [assemble][], [verb][] or any other application bas
 
 ```js
 var assemble = require('assemble');
-var streams = require('assemble-stream');
+var streams = require('assemble-streams');
 
 // create your application
 var app = assemble();
