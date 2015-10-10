@@ -1,18 +1,69 @@
 'use strict';
 
+require('mocha');
+var path = require('path');
 var assert = require('assert');
-var should = require('should');
+var App = require('templates');
 var streams = require('./');
+var app;
 
-describe('streams', function () {
-  it('should:', function () {
-    streams('a').should.eql({a: 'b'});
-    streams('a').should.equal('a');
+describe('src()', function() {
+  beforeEach(function () {
+    app = new App();
+    app.use(streams);
+
+    app.create('pages');
+    app.create('posts');
+
+    app.page('a.html', {content: '...'});
+    app.page('b.html', {content: '...'});
+    app.page('c.html', {content: '...'});
+
+    app.post('x.html', {content: '...'});
+    app.post('y.html', {content: '...'});
+    app.post('z.html', {content: '...'});
   });
 
-  it('should throw an error:', function () {
-    (function () {
-      streams();
-    }).should.throw('streams expects valid arguments');
+  it('should return add the `toStream` method to the instance', function (done) {
+    assert(app.toStream);
+    assert.equal(typeof app.toStream, 'function');
+    done();
+  });
+
+  it('should return an input stream a view collection', function (done) {
+    var files = [];
+    app.toStream('pages')
+      .on('error', done)
+      .on('data', function (file) {
+        files.push(file.path);
+      })
+      .on('end', function () {
+        assert(files.length === 3);
+        assert(files[0] === 'a.html');
+        assert(files[1] === 'b.html');
+        assert(files[2] === 'c.html');
+        done();
+      });
+  });
+
+  it('should stack multiple collections', function (done) {
+    var files = [];
+    app.toStream('pages')
+      .pipe(app.toStream('posts'))
+      .on('error', done)
+      .on('data', function (file) {
+        files.push(file.path);
+      })
+      .on('end', function () {
+        assert(files.length === 6);
+        assert(files[0] === 'a.html');
+        assert(files[1] === 'b.html');
+        assert(files[2] === 'c.html');
+
+        assert(files[3] === 'x.html');
+        assert(files[4] === 'y.html');
+        assert(files[5] === 'z.html');
+        done();
+      });
   });
 });
