@@ -66,4 +66,41 @@ describe('src()', function() {
         done();
       });
   });
+
+  it('should pipe a collection', function (done) {
+    var files = [];
+    app.pages.toStream()
+      .on('error', done)
+      .on('data', function (file) {
+        files.push(file.path);
+      })
+      .on('end', function () {
+        assert(files.length === 3);
+        assert(files[0] === 'a.html');
+        assert(files[1] === 'b.html');
+        assert(files[2] === 'c.html');
+        done();
+      });
+  });
+
+  it('should pipe from one collection to another', function (done) {
+    var files = [];
+    app.pages.toStream()
+      .pipe(app.toStream('posts'))
+      .on('error', done)
+      .on('data', function (file) {
+        files.push(file.path);
+      })
+      .on('end', function () {
+        assert(files.length === 6);
+        assert(files[0] === 'a.html');
+        assert(files[1] === 'b.html');
+        assert(files[2] === 'c.html');
+
+        assert(files[3] === 'x.html');
+        assert(files[4] === 'y.html');
+        assert(files[5] === 'z.html');
+        done();
+      });
+  });
 });

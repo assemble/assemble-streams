@@ -9,7 +9,7 @@
 
 var utils = require('./utils');
 
-module.exports = function (app) {
+module.exports = function fn(app) {
 
   /**
    * Push a view collection into a vinyl stream.
@@ -26,21 +26,33 @@ module.exports = function (app) {
    * @api public
    */
 
-  app.toStream = function (name) {
+  app.mixin('toStream', function (name) {
     var stream = utils.through.obj();
     var src = utils.srcStream;
     stream.setMaxListeners(0);
 
-    if (typeof name === 'undefined') {
+    if (typeof name === 'undefined' && !this.isCollection) {
       process.nextTick(stream.end.bind(stream));
       return src(stream);
     }
 
-    var views = this.getViews(name);
+    var views;
+    if (this.isApp && name) {
+      views = this.getViews(name);
+    } else {
+      views = this.views;
+    }
+
     setImmediate(function () {
-      for (var key in views) stream.write(views[key]);
+      for (var key in views) {
+        var view = views[key];
+        stream.write(view);
+      }
       stream.end();
     });
     return src(stream);
-  };
+  });
+
+  if (app.isApp) return fn;
+
 };
