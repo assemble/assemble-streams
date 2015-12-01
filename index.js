@@ -7,9 +7,9 @@
 
 'use strict';
 
-var utils = require('./utils');
 
 module.exports = function fn(app) {
+  var utils = require('./utils');
 
   /**
    * Push a view collection into a vinyl stream.
@@ -26,7 +26,7 @@ module.exports = function fn(app) {
    * @api public
    */
 
-  app.mixin('toStream', function (name) {
+  app.mixin('toStream', function (name, filterFn) {
     var stream = utils.through.obj();
     var src = utils.srcStream;
     stream.setMaxListeners(0);
@@ -45,8 +45,10 @@ module.exports = function fn(app) {
 
     setImmediate(function () {
       for (var key in views) {
-        var view = views[key];
-        stream.write(view);
+        if (!filter(key, views[key], filterFn)) {
+          continue;
+        }
+        stream.write(views[key]);
       }
       stream.end();
     });
@@ -54,5 +56,12 @@ module.exports = function fn(app) {
   });
 
   if (app.isApp) return fn;
-
 };
+
+
+function filter(key, view, fn) {
+  if (typeof fn === 'function') {
+    return fn(key, view);
+  }
+  return true;
+}

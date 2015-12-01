@@ -103,4 +103,22 @@ describe('src()', function() {
         done();
       });
   });
+
+  it('should support an optional filter function as the second argument', function (done) {
+    var files = [];
+    app.toStream('pages', function(key, view) {
+        return key !== 'a.html';
+      })
+      .on('error', done)
+      .on('data', function (file) {
+        files.push(file.path);
+      })
+      .on('end', function () {
+        assert(files.length === 2);
+        assert(files[0] === 'b.html');
+        assert(files[1] === 'c.html');
+        assert(files.indexOf('a.html') === -1);
+        done();
+      });
+  });
 });
