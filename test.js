@@ -3,13 +3,13 @@
 require('mocha');
 var path = require('path');
 var assert = require('assert');
-var App = require('templates');
+var assemble = require('assemble-core');
 var streams = require('./');
 var app;
 
 describe('src()', function() {
   beforeEach(function () {
-    app = new App();
+    app = assemble();
     app.use(streams);
 
     app.create('pages');
