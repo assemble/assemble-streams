@@ -8,7 +8,7 @@ var streams = require('./');
 var app;
 
 describe('src()', function() {
-  beforeEach(function () {
+  beforeEach(function() {
     app = assemble();
     app.use(streams);
 
@@ -24,20 +24,20 @@ describe('src()', function() {
     app.post('z.html', {content: '...'});
   });
 
-  it('should return add the `toStream` method to the instance', function (done) {
+  it('should return add the `toStream` method to the instance', function(done) {
     assert(app.toStream);
     assert.equal(typeof app.toStream, 'function');
     done();
   });
 
-  it('should return an input stream a view collection', function (done) {
+  it('should return an input stream a view collection', function(done) {
     var files = [];
     app.toStream('pages')
       .on('error', done)
-      .on('data', function (file) {
+      .on('data', function(file) {
         files.push(file.path);
       })
-      .on('end', function () {
+      .on('end', function() {
         assert(files.length === 3);
         assert(files[0] === 'a.html');
         assert(files[1] === 'b.html');
@@ -46,15 +46,15 @@ describe('src()', function() {
       });
   });
 
-  it('should stack multiple collections', function (done) {
+  it('should stack multiple collections', function(done) {
     var files = [];
     app.toStream('pages')
       .pipe(app.toStream('posts'))
       .on('error', done)
-      .on('data', function (file) {
+      .on('data', function(file) {
         files.push(file.path);
       })
-      .on('end', function () {
+      .on('end', function() {
         assert(files.length === 6);
         assert(files[0] === 'a.html');
         assert(files[1] === 'b.html');
@@ -67,14 +67,14 @@ describe('src()', function() {
       });
   });
 
-  it('should pipe a collection', function (done) {
+  it('should pipe a collection', function(done) {
     var files = [];
     app.pages.toStream()
       .on('error', done)
-      .on('data', function (file) {
+      .on('data', function(file) {
         files.push(file.path);
       })
-      .on('end', function () {
+      .on('end', function() {
         assert(files.length === 3);
         assert(files[0] === 'a.html');
         assert(files[1] === 'b.html');
@@ -83,15 +83,15 @@ describe('src()', function() {
       });
   });
 
-  it('should pipe from one collection to another', function (done) {
+  it('should pipe from one collection to another', function(done) {
     var files = [];
     app.pages.toStream()
       .pipe(app.toStream('posts'))
       .on('error', done)
-      .on('data', function (file) {
+      .on('data', function(file) {
         files.push(file.path);
       })
-      .on('end', function () {
+      .on('end', function() {
         assert(files.length === 6);
         assert(files[0] === 'a.html');
         assert(files[1] === 'b.html');
@@ -104,16 +104,16 @@ describe('src()', function() {
       });
   });
 
-  it('should support an optional filter function as the second argument', function (done) {
+  it('should support an optional filter function as the second argument', function(done) {
     var files = [];
     app.toStream('pages', function(key, view) {
         return key !== 'a.html';
       })
       .on('error', done)
-      .on('data', function (file) {
+      .on('data', function(file) {
         files.push(file.path);
       })
-      .on('end', function () {
+      .on('end', function() {
         assert(files.length === 2);
         assert(files[0] === 'b.html');
         assert(files[1] === 'c.html');
