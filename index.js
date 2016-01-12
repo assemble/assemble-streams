@@ -7,9 +7,11 @@
 
 'use strict';
 
+var handle = require('assemble-handle');
+var through = require('through2');
+var src = require('src-stream');
 
 module.exports = function fn(app) {
-  var utils = require('./utils');
 
   /**
    * Push a view collection into a vinyl stream.
@@ -27,8 +29,7 @@ module.exports = function fn(app) {
    */
 
   app.mixin('toStream', function (name, filterFn) {
-    var stream = utils.through.obj();
-    var src = utils.srcStream;
+    var stream = through.obj();
     stream.setMaxListeners(0);
 
     if (typeof name === 'undefined' && !this.isCollection) {
@@ -52,12 +53,14 @@ module.exports = function fn(app) {
       }
       stream.end();
     });
-    return src(stream);
+
+    return src(stream).pipe(handle(this, 'onStream'));
   });
 
-  if (app.isApp) return fn;
+  if (app.isApp) {
+    return fn;
+  }
 };
-
 
 function filter(key, view, fn) {
   if (typeof fn === 'function') {
