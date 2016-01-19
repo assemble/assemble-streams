@@ -10,7 +10,7 @@ var app;
 describe('src()', function() {
   beforeEach(function() {
     app = assemble();
-    app.use(streams);
+    app.use(streams());
 
     app.create('pages');
     app.create('posts');
