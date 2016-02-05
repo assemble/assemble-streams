@@ -4,7 +4,7 @@ require('mocha');
 var path = require('path');
 var assert = require('assert');
 var assemble = require('assemble-core');
-var streams = require('./');
+var streams = require('../');
 var app;
 
 describe('src()', function() {
@@ -66,6 +66,27 @@ describe('src()', function() {
         done();
       });
   });
+
+  it('should work with `.src`', function(done) {
+    var files = [];
+    app.src(__dirname + '/fixtures/*.hbs')
+      .pipe(app.toStream('posts'))
+      .on('error', done)
+      .on('data', function(file) {
+        files.push(file.path);
+      })
+      .on('end', function() {
+        assert.equal(files.length, 6);
+        assert.equal(files[0], 'x.html');
+        assert.equal(files[1], 'y.html');
+        assert.equal(files[2], 'z.html');
+
+        assert.equal(path.basename(files[3]), 'a.hbs');
+        assert.equal(path.basename(files[4]), 'b.hbs');
+        assert.equal(path.basename(files[5]), 'c.hbs');
+        done();
+      })
+  })
 
   it('should pipe a collection', function(done) {
     var files = [];
