@@ -56,7 +56,7 @@ module.exports = function(options) {
         stream.end();
       });
 
-      return src(stream).pipe(handle(this, 'onStream'));
+      return src(stream.pipe(handle(this, 'onStream')));
     });
 
     if (app.isApp) {
