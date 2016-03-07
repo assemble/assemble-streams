@@ -31,7 +31,7 @@ module.exports = function(options) {
      * @api public
      */
 
-    app.mixin('toStream', function (name, filterFn) {
+    app.mixin('toStream', function(name, filterFn) {
       var stream = through.obj();
       stream.setMaxListeners(0);
 
@@ -47,7 +47,7 @@ module.exports = function(options) {
         views = this.views;
       }
 
-      setImmediate(function () {
+      setImmediate(function() {
         for (var key in views) {
           if (!filter(key, views[key], filterFn)) {
             continue;
