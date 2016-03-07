@@ -37,6 +37,15 @@
     "stream"
   ],
   "verb": {
+    "run": true,
+    "toc": false,
+    "layout": "default",
+    "tasks": [
+      "readme"
+    ],
+    "plugins": [
+      "gulp-format-md"
+    ],
     "related": {
       "list": [
         "assemble",
@@ -44,10 +53,6 @@
         "assemble-render-file"
       ]
     },
-    "layout": "default",
-    "plugins": [
-      "gulp-format-md"
-    ],
     "reflinks": [
       "base",
       "update",
@@ -55,6 +60,9 @@
       "assemble",
       "verb",
       "templates"
-    ]
+    ],
+    "lint": {
+      "reflinks": true
+    }
   }
 }
