@@ -142,4 +142,20 @@ describe('src()', function() {
         done();
       });
   });
+
+  it('should support an array as the second argument', function(done) {
+    var files = [];
+    app.toStream('pages', ['a.html', 'c.html'])
+      .on('error', done)
+      .on('data', function(file) {
+        files.push(file.path);
+      })
+      .on('end', function() {
+        assert(files.length === 2);
+        assert.equal(files[0], 'a.html');
+        assert.equal(files[1], 'c.html');
+        assert.equal(files.indexOf('b.html'), -1);
+        done();
+      });
+  });
 });

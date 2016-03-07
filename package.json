@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "assemble-handle": "^0.1.0",
+    "match-file": "^0.1.0",
     "src-stream": "^0.1.1",
     "through2": "^2.0.0"
   },

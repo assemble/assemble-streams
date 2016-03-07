@@ -7,13 +7,14 @@
 
 'use strict';
 
-module.exports = function(options) {
-  var handle = require('assemble-handle');
-  var through = require('through2');
-  var src = require('src-stream');
+var handle = require('assemble-handle');
+var through = require('through2');
+var match = require('match-file');
+var src = require('src-stream');
 
+module.exports = function(options) {
   return function fn(app) {
-    if (this.isRegistered('streams')) return;
+    if (this.isRegistered('assemble-streams')) return;
 
     /**
      * Push a view collection into a vinyl stream.
@@ -66,6 +67,17 @@ module.exports = function(options) {
 };
 
 function filter(key, view, fn) {
+  if (Array.isArray(fn)) {
+    var len = fn.length;
+    var idx = -1;
+    while (++idx < len) {
+      var name = fn[idx];
+      if (match(name, view)) {
+        return true;
+      }
+    }
+    return false;
+  }
   if (typeof fn === 'function') {
     return fn(key, view);
   }
