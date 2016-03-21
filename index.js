@@ -47,13 +47,23 @@ module.exports = function(options) {
         views = this.views;
       }
 
+      if (!views && typeof name === 'string') {
+        filterFn = [name];
+        views = Object.keys(this.views).map(function(key) {
+          return this.views[key];
+        });
+      }
+
       setImmediate(function() {
-        for (var key in views) {
-          if (!filter(key, views[key], filterFn)) {
-            continue;
+        var arr = Array.isArray(views) ? views : [views];
+        arr.forEach(function(views) {
+          for (var key in views) {
+            if (!filter(key, views[key], filterFn)) {
+              continue;
+            }
+            stream.write(views[key]);
           }
-          stream.write(views[key]);
-        }
+        });
         stream.end();
       });
 
