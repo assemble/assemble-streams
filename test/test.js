@@ -209,4 +209,44 @@ describe('src()', function() {
         done();
       });
   });
+
+  it('should pipe an individual view into a stream', function(done) {
+    var files = [];
+    app.pages.getView('b.html')
+      .toStream()
+      .on('error', done)
+      .on('data', function(file) {
+        files.push(file.path);
+      })
+      .on('end', function() {
+        assert(files.length === 1);
+        assert.equal(files[0], 'b.html');
+        assert.equal(files.indexOf('a.html'), -1);
+        assert.equal(files.indexOf('c.html'), -1);
+        assert.equal(files.indexOf('x.html'), -1);
+        assert.equal(files.indexOf('y.html'), -1);
+        assert.equal(files.indexOf('z.html'), -1);
+        done();
+      });
+  });
+
+  it('should pipe multiple individual views into a stream', function(done) {
+    var files = [];
+    app.pages.getView('b.html').toStream()
+      .pipe(app.posts.getView('y.html').toStream())
+      .on('error', done)
+      .on('data', function(file) {
+        files.push(file.path);
+      })
+      .on('end', function() {
+        assert(files.length === 2);
+        assert.equal(files[0], 'b.html');
+        assert.equal(files[1], 'y.html');
+        assert.equal(files.indexOf('a.html'), -1);
+        assert.equal(files.indexOf('c.html'), -1);
+        assert.equal(files.indexOf('x.html'), -1);
+        assert.equal(files.indexOf('z.html'), -1);
+        done();
+      });
+  });
 });
