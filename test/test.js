@@ -85,8 +85,27 @@ describe('src()', function() {
         assert.equal(path.basename(files[4]), 'b.hbs');
         assert.equal(path.basename(files[5]), 'c.hbs');
         done();
-      })
-  })
+      });
+  });
+
+  it('should emit `app.onStream` when using `app.toStream`', function(done) {
+    var files = [];
+    app.onStream(/\.html/, function(file, next) {
+      files.push(file.path);
+      next();
+    });
+
+    app.toStream('pages')
+      .on('error', done)
+      .on('data', function() {})
+      .on('end', function() {
+        assert(files.length === 3);
+        assert(files[0] === 'a.html');
+        assert(files[1] === 'b.html');
+        assert(files[2] === 'c.html');
+        done();
+      });
+  });
 
   it('should pipe a collection', function(done) {
     var files = [];
@@ -95,6 +114,25 @@ describe('src()', function() {
       .on('data', function(file) {
         files.push(file.path);
       })
+      .on('end', function() {
+        assert(files.length === 3);
+        assert(files[0] === 'a.html');
+        assert(files[1] === 'b.html');
+        assert(files[2] === 'c.html');
+        done();
+      });
+  });
+
+  it('should emit `app.onStream` when using `app.pages.toStream`', function(done) {
+    var files = [];
+    app.onStream(/\.html/, function(file, next) {
+      files.push(file.path);
+      next();
+    });
+
+    app.pages.toStream()
+      .on('error', done)
+      .on('data', function() {})
       .on('end', function() {
         assert(files.length === 3);
         assert(files[0] === 'a.html');
@@ -246,6 +284,23 @@ describe('src()', function() {
         assert.equal(files.indexOf('c.html'), -1);
         assert.equal(files.indexOf('x.html'), -1);
         assert.equal(files.indexOf('z.html'), -1);
+        done();
+      });
+  });
+
+  it('should emit `app.onStream` when using `view.toStream`', function(done) {
+    var files = [];
+    app.onStream(/\.html/, function(file, next) {
+      files.push(file.path);
+      next();
+    });
+
+    app.pages.getView('b.html').toStream()
+      .on('error', done)
+      .on('data', function() {})
+      .on('end', function() {
+        assert(files.length === 1);
+        assert(files[0] === 'b.html');
         done();
       });
   });
