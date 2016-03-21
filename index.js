@@ -19,6 +19,23 @@ module.exports = function(options) {
     }
 
     if (this.isView || this.isItem) {
+
+      /**
+       * Push the current view into a vinyl stream.
+       *
+       * ```js
+       * app.pages.getView('a.html').toStream()
+       *   .on('data', function(file) {
+       *     console.log(file);
+       *     //=> <Page "a.html" <Buffer 2e 2e 2e>>
+       *   });
+       * ```
+       *
+       * @name .toStream
+       * @return {Stream}
+       * @api public
+       */
+
       this.define('toStream', function() {
         var stream = through.obj();
         stream.setMaxListeners(0);
