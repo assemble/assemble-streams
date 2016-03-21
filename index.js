@@ -13,98 +13,138 @@ var match = require('match-file');
 var src = require('src-stream');
 
 module.exports = function(options) {
-  return function fn(app) {
-    if (!isValidInstance(this)) {
-      return fn;
+  return function appPlugin(app) {
+    if (!isValidInstance(this, 'isApp')) {
+      return appPlugin;
     }
+    app.mixin('toStream', appStream(app));
 
-    if (this.isView || this.isItem) {
+    return function collectionPlugin(collection) {
+      if (!isValidInstance(this, 'isCollection')) {
+        return collectionPlugin;
+      }
+      collection.mixin('toStream', collectionStream(app, this));
 
-      /**
-       * Push the current view into a vinyl stream.
-       *
-       * ```js
-       * app.pages.getView('a.html').toStream()
-       *   .on('data', function(file) {
-       *     console.log(file);
-       *     //=> <Page "a.html" <Buffer 2e 2e 2e>>
-       *   });
-       * ```
-       *
-       * @name .toStream
-       * @return {Stream}
-       * @api public
-       */
-
-      this.define('toStream', function() {
-        var stream = through.obj();
-        stream.setMaxListeners(0);
-        setImmediate(function(view) {
-          stream.write(view);
-          stream.end();
-        }, this);
-        return src(stream.pipe(handle(this, 'onStream')));
-      });
-      return fn;
+      return function viewPlugin(view) {
+        if (!isValidInstance(this, ['isView', 'isItem'])) {
+          return viewPlugin;
+        }
+        this.define('toStream', viewStream(app));
+      }
     }
-
-    /**
-     * Push a view collection into a vinyl stream.
-     *
-     * ```js
-     * app.toStream('posts', function(file) {
-     *   return file.path !== 'index.hbs';
-     * })
-     * ```
-     * @name .toStream
-     * @param {String} `collection` Name of the collection to push into the stream.
-     * @param {Function} Optionally pass a filter function to use for filtering views.
-     * @return {Stream}
-     * @api public
-     */
-
-    app.mixin('toStream', function(name, filterFn) {
-      var stream = through.obj();
-      stream.setMaxListeners(0);
-
-      if (typeof name === 'undefined' && !this.isCollection) {
-        process.nextTick(stream.end.bind(stream));
-        return src(stream);
-      }
-
-      var views;
-      if (this.isApp && name) {
-        views = tryGetViews(this, name);
-      } else {
-        views = this.views;
-      }
-
-      if (!views && typeof name !== 'undefined') {
-        filterFn = name;
-        views = Object.keys(this.views).map(function(key) {
-          return this.views[key];
-        }, this);
-      }
-
-      setImmediate(function() {
-        var arr = Array.isArray(views) ? views : [views];
-        arr.forEach(function(views) {
-          for (var key in views) {
-            if (!filter(key, views[key], filterFn)) {
-              continue;
-            }
-            stream.write(views[key]);
-          }
-        });
-        stream.end();
-      });
-
-      return src(stream.pipe(handle(this, 'onStream')));
-    });
-
-    return fn;
   };
 };
+
+
+/**
+ * Push a view collection into a vinyl stream.
+ *
+ * ```js
+ * app.toStream('posts', function(file) {
+ *   return file.path !== 'index.hbs';
+ * })
+ * ```
+ * @name .toStream
+ * @param {String} `collection` Name of the collection to push into the stream.
+ * @param {Function} Optionally pass a filter function to use for filtering views.
+ * @return {Stream}
+ * @api public
+ */
+
+function appStream(app) {
+  return function(name, filterFn) {
+    var stream = through.obj();
+    stream.setMaxListeners(0);
+
+    if (typeof name === 'undefined') {
+      process.nextTick(stream.end.bind(stream));
+      return src(stream);
+    }
+
+    var write = writeStream(stream);
+    var views = tryGetViews(this, name);
+
+    if (!views && typeof name !== 'undefined') {
+      filterFn = name;
+      setImmediate(function() {
+        Object.keys(this.views).forEach(function(key) {
+          views = this.views[key];
+          write(views, filterFn);
+        }, this);
+        stream.end();
+      }.bind(this));
+
+      return src(stream.pipe(handle(this, 'onStream')));
+    }
+
+    setImmediate(function() {
+      write(views, filterFn);
+      stream.end();
+    });
+
+    return src(stream.pipe(handle(this, 'onStream')));
+  };
+}
+
+/**
+ * Push a view collection into a vinyl stream.
+ *
+ * ```js
+ * app.posts.toStream(function(file) {
+ *   return file.path !== 'index.hbs';
+ * })
+ * ```
+
+ * @name .toStream
+ * @param {Function} Optionally pass a filter function to use for filtering views.
+ * @return {Stream}
+ * @api public
+ */
+
+function collectionStream(app, collection) {
+  return function(filterFn) {
+    var stream = through.obj();
+    stream.setMaxListeners(0);
+
+    var views = this.views;
+    var write = writeStream(stream);
+
+    setImmediate(function() {
+      write(views, filterFn);
+      stream.end();
+    });
+
+    return src(stream.pipe(handle(this, 'onStream')));
+  };
+}
+
+/**
+ * Push the current view into a vinyl stream.
+ *
+ * ```js
+ * app.pages.getView('a.html').toStream()
+ *   .on('data', function(file) {
+ *     console.log(file);
+ *     //=> <Page "a.html" <Buffer 2e 2e 2e>>
+ *   });
+ * ```
+ *
+ * @name .toStream
+ * @return {Stream}
+ * @api public
+ */
+
+function viewStream(app) {
+  return function() {
+    var stream = through.obj();
+    stream.setMaxListeners(0);
+    setImmediate(function(view) {
+      stream.write(view);
+      stream.end();
+    }, this);
+    return src(stream.pipe(handle(this, 'onStream')));
+  };
+}
 
 function tryGetViews(app, name) {
   try {
@@ -135,12 +175,28 @@ function filter(key, view, fn) {
   return true;
 }
 
-function isValidInstance(app) {
+function writeStream(stream) {
+  return function(views, filterFn) {
+    for (var key in views) {
+      if (!filter(key, views[key], filterFn)) {
+        continue;
+      }
+      stream.write(views[key]);
+    }
+  };
+}
+
+function isValidInstance(app, types) {
   if (app.isRegistered('assemble-streams')) {
     return false;
   }
-  if (app.isApp || app.isCollection || app.isView || app.isItem) {
-    return true;
-  }
-  return false;
+  types = Array.isArray(types) ? types : [types];
+  var valid = false;
+  types.forEach(function(type) {
+    if (!valid && app[type]) {
+      valid = true;
+    }
+  });
+
+  return valid;
 }
