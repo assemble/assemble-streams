@@ -58,7 +58,7 @@ app.toStream('posts', function(file) {
 })
 ```
 
-### [collection.toStream](index.js#L104)
+### [collection.toStream](index.js#L106)
 
 Push a view collection into a vinyl stream.
 
@@ -75,7 +75,7 @@ app.posts.toStream(function(file) {
 })
 ```
 
-### [view.toStream](index.js#L137)
+### [view.toStream](index.js#L141)
 
 Push the current view into a vinyl stream.
 
