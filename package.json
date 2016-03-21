@@ -23,12 +23,13 @@
     "assemble-handle": "^0.1.0",
     "match-file": "^0.1.0",
     "src-stream": "^0.1.1",
-    "through2": "^2.0.0"
+    "through2": "^2.0.1"
   },
   "devDependencies": {
-    "assemble-core": "^0.8.3",
-    "gulp-format-md": "^0.1.5",
-    "mocha": "*"
+    "assemble-fs": "^0.4.6",
+    "gulp-format-md": "^0.1.7",
+    "mocha": "^2.4.5",
+    "templates": "^0.15.12"
   },
   "keywords": [
     "assemble",
