@@ -44,7 +44,7 @@ module.exports = function(options) {
  *   return file.path !== 'index.hbs';
  * })
  * ```
- * @name .toStream
+ * @name app.toStream
  * @param {String} `collection` Name of the collection to push into the stream.
  * @param {Function} Optionally pass a filter function to use for filtering views.
  * @return {Stream}
@@ -95,7 +95,7 @@ function appStream(app) {
  * })
  * ```
 
- * @name .toStream
+ * @name collection.toStream
  * @param {Function} Optionally pass a filter function to use for filtering views.
  * @return {Stream}
  * @api public
@@ -129,7 +129,7 @@ function collectionStream(app, collection) {
  *   });
  * ```
  *
- * @name .toStream
+ * @name view.toStream
  * @return {Stream}
  * @api public
  */

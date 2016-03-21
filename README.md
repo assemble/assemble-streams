@@ -40,7 +40,7 @@ See the [tests](./test.js) for more examples.
 
 ## API
 
-### [.toStream](index.js#L54)
+### [app.toStream](index.js#L54)
 
 Push a view collection into a vinyl stream.
 
@@ -58,7 +58,7 @@ app.toStream('posts', function(file) {
 })
 ```
 
-### [.toStream](index.js#L104)
+### [collection.toStream](index.js#L104)
 
 Push a view collection into a vinyl stream.
 
@@ -75,7 +75,7 @@ app.posts.toStream(function(file) {
 })
 ```
 
-### [.toStream](index.js#L137)
+### [view.toStream](index.js#L137)
 
 Push the current view into a vinyl stream.
 
