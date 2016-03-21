@@ -14,7 +14,22 @@ var src = require('src-stream');
 
 module.exports = function(options) {
   return function fn(app) {
-    if (this.isRegistered('assemble-streams')) return;
+    if (!isValidInstance(this)) {
+      return fn;
+    }
+
+    if (this.isView || this.isItem) {
+      this.define('toStream', function() {
+        var stream = through.obj();
+        stream.setMaxListeners(0);
+        setImmediate(function(view) {
+          stream.write(view);
+          stream.end();
+        }, this);
+        return src(stream.pipe(handle(this, 'onStream')));
+      });
+      return fn;
+    }
 
     /**
      * Push a view collection into a vinyl stream.
@@ -101,4 +116,14 @@ function filter(key, view, fn) {
     return match(fn, view);
   }
   return true;
+}
+
+function isValidInstance(app) {
+  if (app.isRegistered('assemble-streams')) {
+    return false;
+  }
+  if (app.isApp || app.isCollection || app.isView || app.isItem) {
+    return true;
+  }
+  return false;
 }
