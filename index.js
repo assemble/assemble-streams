@@ -52,6 +52,8 @@ module.exports = function(options) {
  */
 
 function appStream(app) {
+  initHandlers(app);
+
   return function(name, filterFn) {
     var stream = through.obj();
     stream.setMaxListeners(0);
@@ -102,6 +104,8 @@ function appStream(app) {
  */
 
 function collectionStream(app, collection) {
+  initHandlers(collection);
+
   return function(filterFn) {
     var stream = through.obj();
     stream.setMaxListeners(0);
@@ -114,7 +118,7 @@ function collectionStream(app, collection) {
       stream.end();
     });
 
-    return src(stream.pipe(handle(this, 'onStream')));
+    return src(stream.pipe(handle(app, 'onStream')));
   };
 }
 
@@ -142,7 +146,7 @@ function viewStream(app) {
       stream.write(view);
       stream.end();
     }, this);
-    return src(stream.pipe(handle(this, 'onStream')));
+    return src(stream.pipe(handle(app, 'onStream')));
   };
 }
 
@@ -184,6 +188,12 @@ function writeStream(stream) {
       stream.write(views[key]);
     }
   };
+}
+
+function initHandlers(app) {
+  if (typeof app.handler === 'function' && typeof app.onStream !== 'function') {
+    app.handler('onStream');
+  }
 }
 
 function isValidInstance(app, types) {
