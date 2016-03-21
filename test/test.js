@@ -3,14 +3,16 @@
 require('mocha');
 var path = require('path');
 var assert = require('assert');
-var assemble = require('assemble-core');
+var templates = require('templates');
+var fs = require('assemble-fs');
 var streams = require('../');
 var app;
 
 describe('src()', function() {
   beforeEach(function() {
-    app = assemble();
+    app = templates();
     app.use(streams());
+    app.use(fs());
 
     app.create('pages');
     app.create('posts');
