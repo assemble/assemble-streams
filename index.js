@@ -42,16 +42,16 @@ module.exports = function(options) {
 
       var views;
       if (this.isApp && name) {
-        views = this.getViews(name);
+        views = tryGetViews(this, name);
       } else {
         views = this.views;
       }
 
-      if (!views && typeof name === 'string') {
-        filterFn = [name];
+      if (!views && typeof name !== 'undefined') {
+        filterFn = name;
         views = Object.keys(this.views).map(function(key) {
           return this.views[key];
-        });
+        }, this);
       }
 
       setImmediate(function() {
@@ -70,11 +70,17 @@ module.exports = function(options) {
       return src(stream.pipe(handle(this, 'onStream')));
     });
 
-    if (app.isApp) {
-      return fn;
-    }
+    return fn;
   };
 };
+
+function tryGetViews(app, name) {
+  try {
+    return app.getViews(name);
+  } catch (err) {
+    return;
+  }
+}
 
 function filter(key, view, fn) {
   if (Array.isArray(fn)) {
@@ -90,6 +96,9 @@ function filter(key, view, fn) {
   }
   if (typeof fn === 'function') {
     return fn(key, view);
+  }
+  if (typeof fn === 'string') {
+    return match(fn, view);
   }
   return true;
 }
