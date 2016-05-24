@@ -7,34 +7,28 @@
 
 'use strict';
 
-var handle = require('assemble-handle');
-var through = require('through2');
-var match = require('match-file');
-var src = require('src-stream');
+var utils = require('./utils');
 
 module.exports = function(options) {
   return function appPlugin(app) {
-    if (!isValidInstance(this, 'isApp')) {
-      return appPlugin;
-    }
-    app.mixin('toStream', appStream(app));
+    if (!utils.isValid(app)) return appPlugin;
+    app.define('toStream', appStream(app));
 
     return function collectionPlugin(collection) {
-      if (!isValidInstance(this, 'isCollection')) {
+      if (!utils.isValid(collection, ['views', 'collection'])) {
         return collectionPlugin;
       }
-      collection.mixin('toStream', collectionStream(app, this));
+      collection.define('toStream', collectionStream(app, this));
 
       return function viewPlugin(view) {
-        if (!isValidInstance(this, ['isView', 'isItem'])) {
+        if (!utils.isValid(view, ['view', 'item', 'file'])) {
           return viewPlugin;
         }
         this.define('toStream', viewStream(app));
-      }
-    }
+      };
+    };
   };
 };
-
 
 /**
  * Push a view collection into a vinyl stream.
@@ -55,12 +49,12 @@ function appStream(app) {
   initHandlers(app);
 
   return function(name, filterFn) {
-    var stream = through.obj();
+    var stream = utils.through.obj();
     stream.setMaxListeners(0);
 
     if (typeof name === 'undefined') {
       process.nextTick(stream.end.bind(stream));
-      return src(stream);
+      return utils.src(stream);
     }
 
     var write = writeStream(stream);
@@ -76,7 +70,7 @@ function appStream(app) {
         stream.end();
       }.bind(this));
 
-      return src(stream.pipe(handle(this, 'onStream')));
+      return utils.src(stream.pipe(utils.handle(this, 'onStream')));
     }
 
     setImmediate(function() {
@@ -84,7 +78,7 @@ function appStream(app) {
       stream.end();
     });
 
-    return src(stream.pipe(handle(this, 'onStream')));
+    return utils.src(stream.pipe(utils.handle(this, 'onStream')));
   };
 }
 
@@ -107,7 +101,7 @@ function collectionStream(app, collection) {
   initHandlers(collection);
 
   return function(filterFn) {
-    var stream = through.obj();
+    var stream = utils.through.obj();
     stream.setMaxListeners(0);
 
     var views = this.views;
@@ -118,7 +112,7 @@ function collectionStream(app, collection) {
       stream.end();
     });
 
-    return src(stream.pipe(handle(app, 'onStream')));
+    return utils.src(stream.pipe(utils.handle(app, 'onStream')));
   };
 }
 
@@ -140,22 +134,20 @@ function collectionStream(app, collection) {
 
 function viewStream(app) {
   return function() {
-    var stream = through.obj();
+    var stream = utils.through.obj();
     stream.setMaxListeners(0);
     setImmediate(function(view) {
       stream.write(view);
       stream.end();
     }, this);
-    return src(stream.pipe(handle(app, 'onStream')));
+    return utils.src(stream.pipe(utils.handle(app, 'onStream')));
   };
 }
 
 function tryGetViews(app, name) {
   try {
     return app.getViews(name);
-  } catch (err) {
-    return;
-  }
+  } catch (err) {}
 }
 
 function filter(key, view, fn) {
@@ -164,7 +156,7 @@ function filter(key, view, fn) {
     var idx = -1;
     while (++idx < len) {
       var name = fn[idx];
-      if (match(name, view)) {
+      if (utils.match(name, view)) {
         return true;
       }
     }
@@ -174,7 +166,7 @@ function filter(key, view, fn) {
     return fn(key, view);
   }
   if (typeof fn === 'string') {
-    return match(fn, view);
+    return utils.match(fn, view);
   }
   return true;
 }
@@ -194,19 +186,4 @@ function initHandlers(app) {
   if (typeof app.handler === 'function' && typeof app.onStream !== 'function') {
     app.handler('onStream');
   }
-}
-
-function isValidInstance(app, types) {
-  if (app.isRegistered('assemble-streams')) {
-    return false;
-  }
-  types = Array.isArray(types) ? types : [types];
-  var valid = false;
-  types.forEach(function(type) {
-    if (!valid && app[type]) {
-      valid = true;
-    }
-  });
-
-  return valid;
 }

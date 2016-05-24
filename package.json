@@ -10,7 +10,8 @@
   },
   "license": "MIT",
   "files": [
-    "index.js"
+    "index.js",
+    "utils.js"
   ],
   "main": "index.js",
   "engines": {
@@ -20,22 +21,28 @@
     "test": "mocha"
   },
   "dependencies": {
-    "assemble-handle": "^0.1.0",
-    "match-file": "^0.1.0",
+    "assemble-handle": "^0.1.2",
+    "is-registered": "^0.1.4",
+    "is-valid-instance": "^0.1.0",
+    "lazy-cache": "^2.0.1",
+    "match-file": "^0.2.0",
     "src-stream": "^0.1.1",
     "through2": "^2.0.1"
   },
   "devDependencies": {
-    "assemble-fs": "^0.4.6",
-    "gulp-format-md": "^0.1.7",
-    "mocha": "^2.4.5",
-    "templates": "^0.15.12"
+    "assemble-fs": "^0.4.7",
+    "gulp-format-md": "^0.1.9",
+    "mocha": "^2.5.1",
+    "templates": "^0.18.3"
   },
   "keywords": [
     "assemble",
     "assembleplugin",
     "collection",
-    "stream"
+    "source",
+    "src",
+    "stream",
+    "vinyl"
   ],
   "verb": {
     "run": true,
@@ -55,12 +62,12 @@
       ]
     },
     "reflinks": [
-      "base",
-      "update",
-      "generate",
       "assemble",
-      "verb",
-      "templates"
+      "base",
+      "generate",
+      "templates",
+      "update",
+      "verb"
     ],
     "lint": {
       "reflinks": true
