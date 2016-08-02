@@ -11,17 +11,17 @@ var utils = require('./utils');
 
 module.exports = function(options) {
   return function appPlugin(app) {
-    if (!utils.isValid(app)) return appPlugin;
+    if (!utils.isValid(app, 'assemble-streams')) return appPlugin;
     app.define('toStream', appStream(app));
 
     return function collectionPlugin(collection) {
-      if (!utils.isValid(collection, ['views', 'collection'])) {
+      if (!utils.isValid(collection, 'assemble-streams-collection', ['views', 'collection'])) {
         return collectionPlugin;
       }
       collection.define('toStream', collectionStream(app, this));
 
       return function viewPlugin(view) {
-        if (!utils.isValid(view, ['view', 'item', 'file'])) {
+        if (!utils.isValid(view, 'assemble-streams-view', ['view', 'item', 'file'])) {
           return viewPlugin;
         }
         this.define('toStream', viewStream(app));
@@ -70,7 +70,7 @@ function appStream(app) {
         stream.end();
       }.bind(this));
 
-      return utils.src(stream.pipe(utils.handle(this, 'onStream')));
+      return utils.src(stream.pipe(utils.handle.once(this, 'onStream')));
     }
 
     setImmediate(function() {
@@ -78,7 +78,7 @@ function appStream(app) {
       stream.end();
     });
 
-    return utils.src(stream.pipe(utils.handle(this, 'onStream')));
+    return utils.src(stream.pipe(utils.handle.once(this, 'onStream')));
   };
 }
 
@@ -112,7 +112,7 @@ function collectionStream(app, collection) {
       stream.end();
     });
 
-    return utils.src(stream.pipe(utils.handle(app, 'onStream')));
+    return utils.src(stream.pipe(utils.handle.once(app, 'onStream')));
   };
 }
 
@@ -140,7 +140,7 @@ function viewStream(app) {
       stream.write(view);
       stream.end();
     }, this);
-    return utils.src(stream.pipe(utils.handle(app, 'onStream')));
+    return utils.src(stream.pipe(utils.handle.once(app, 'onStream')));
   };
 }
 
