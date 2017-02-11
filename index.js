@@ -15,9 +15,6 @@ module.exports = function(options) {
       app.define('toStream', appStream(app));
       app.on('view', function(view) {
         viewPlugin.call(view, view);
-        app.handle('onLoad', view, function(err) {
-          if (err) throw err;
-        });
       });
       return collectionPlugin;
     }
@@ -30,8 +27,8 @@ module.exports = function(options) {
     }
 
     function viewPlugin(view) {
-      if (utils.isValid(view, 'assemble-streams', ['item', 'file'])) {
-        this.define('toStream', viewStream(app));
+      if (utils.isValid(this, 'assemble-streams', ['item', 'file'])) {
+        utils.define(this, 'toStream', viewStream(app));
       }
     }
     return plugin;

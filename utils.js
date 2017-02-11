@@ -9,6 +9,7 @@ require = utils;
  */
 
 require('assemble-handle', 'handle');
+require('define-property', 'define');
 require('is-valid-app', 'isValid');
 require('kind-of', 'typeOf');
 require('match-file', 'match');

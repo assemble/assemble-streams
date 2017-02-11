@@ -141,27 +141,6 @@ describe('src()', function() {
       });
   });
 
-  it('should emit `onLoad` for a view that is not on a collection', function(done) {
-    var files = [];
-    app.onLoad(/\.bar$/, function(file, next) {
-      files.push(file);
-      next();
-    });
-
-    var view = app.view('foo.bar', {content: 'this is foo'});
-    view.toStream()
-      .on('error', done)
-      .on('data', function(view) {
-        files.push(view);
-      })
-      .on('end', function() {
-        assert.equal(files.length, 2);
-        assert.equal(files[0].path, 'foo.bar');
-        assert.equal(files[1].path, 'foo.bar');
-        done();
-      });
-  });
-
   it('should emit `onStream` for a view that is not on a collection', function(done) {
     var files = [];
     app.onStream(/\.bar$/, function(file, next) {
