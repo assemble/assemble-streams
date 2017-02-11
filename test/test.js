@@ -40,10 +40,10 @@ describe('src()', function() {
         files.push(file.path);
       })
       .on('end', function() {
-        assert(files.length === 3);
-        assert(files[0] === 'a.html');
-        assert(files[1] === 'b.html');
-        assert(files[2] === 'c.html');
+        assert.equal(files.length, 3);
+        assert.equal(files[0], 'a.html');
+        assert.equal(files[1], 'b.html');
+        assert.equal(files[2], 'c.html');
         done();
       });
   });
@@ -57,14 +57,14 @@ describe('src()', function() {
         files.push(file.path);
       })
       .on('end', function() {
-        assert(files.length === 6);
-        assert(files[0] === 'a.html');
-        assert(files[1] === 'b.html');
-        assert(files[2] === 'c.html');
+        assert.equal(files.length, 6);
+        assert.equal(files[0], 'a.html');
+        assert.equal(files[1], 'b.html');
+        assert.equal(files[2], 'c.html');
 
-        assert(files[3] === 'x.html');
-        assert(files[4] === 'y.html');
-        assert(files[5] === 'z.html');
+        assert.equal(files[3], 'x.html');
+        assert.equal(files[4], 'y.html');
+        assert.equal(files[5], 'z.html');
         done();
       });
   });
@@ -101,10 +101,10 @@ describe('src()', function() {
       .on('error', done)
       .on('data', function() {})
       .on('end', function() {
-        assert(files.length === 3);
-        assert(files[0] === 'a.html');
-        assert(files[1] === 'b.html');
-        assert(files[2] === 'c.html');
+        assert.equal(files.length, 3);
+        assert.equal(files[0], 'a.html');
+        assert.equal(files[1], 'b.html');
+        assert.equal(files[2], 'c.html');
         done();
       });
   });
@@ -117,10 +117,10 @@ describe('src()', function() {
         files.push(file.path);
       })
       .on('end', function() {
-        assert(files.length === 3);
-        assert(files[0] === 'a.html');
-        assert(files[1] === 'b.html');
-        assert(files[2] === 'c.html');
+        assert.equal(files.length, 3);
+        assert.equal(files[0], 'a.html');
+        assert.equal(files[1], 'b.html');
+        assert.equal(files[2], 'c.html');
         done();
       });
   });
@@ -136,10 +136,10 @@ describe('src()', function() {
       .on('error', done)
       .on('data', function() {})
       .on('end', function() {
-        assert(files.length === 3);
-        assert(files[0] === 'a.html');
-        assert(files[1] === 'b.html');
-        assert(files[2] === 'c.html');
+        assert.equal(files.length, 3);
+        assert.equal(files[0], 'a.html');
+        assert.equal(files[1], 'b.html');
+        assert.equal(files[2], 'c.html');
         done();
       });
   });
@@ -153,14 +153,14 @@ describe('src()', function() {
         files.push(file.path);
       })
       .on('end', function() {
-        assert(files.length === 6);
-        assert(files[0] === 'a.html');
-        assert(files[1] === 'b.html');
-        assert(files[2] === 'c.html');
+        assert.equal(files.length, 6);
+        assert.equal(files[0], 'a.html');
+        assert.equal(files[1], 'b.html');
+        assert.equal(files[2], 'c.html');
 
-        assert(files[3] === 'x.html');
-        assert(files[4] === 'y.html');
-        assert(files[5] === 'z.html');
+        assert.equal(files[3], 'x.html');
+        assert.equal(files[4], 'y.html');
+        assert.equal(files[5], 'z.html');
         done();
       });
   });
@@ -175,10 +175,10 @@ describe('src()', function() {
         files.push(file.path);
       })
       .on('end', function() {
-        assert(files.length === 2);
-        assert(files[0] === 'b.html');
-        assert(files[1] === 'c.html');
-        assert(files.indexOf('a.html') === -1);
+        assert.equal(files.length, 2);
+        assert.equal(files[0], 'b.html');
+        assert.equal(files[1], 'c.html');
+        assert.equal(files.indexOf('a.html'), -1);
         done();
       });
   });
@@ -191,7 +191,7 @@ describe('src()', function() {
         files.push(file.path);
       })
       .on('end', function() {
-        assert(files.length === 2);
+        assert.equal(files.length, 2);
         assert.equal(files[0], 'a.html');
         assert.equal(files[1], 'c.html');
         assert.equal(files.indexOf('b.html'), -1);
@@ -207,7 +207,7 @@ describe('src()', function() {
         files.push(file.path);
       })
       .on('end', function() {
-        assert(files.length === 1);
+        assert.equal(files.length, 1);
         assert.equal(files[0], 'c.html');
         assert.equal(files.indexOf('a.html'), -1);
         assert.equal(files.indexOf('b.html'), -1);
@@ -223,7 +223,7 @@ describe('src()', function() {
         files.push(file.path);
       })
       .on('end', function() {
-        assert(files.length === 1);
+        assert.equal(files.length, 1);
         assert.equal(files[0], 'c.html');
         assert.equal(files.indexOf('a.html'), -1);
         assert.equal(files.indexOf('b.html'), -1);
@@ -239,7 +239,7 @@ describe('src()', function() {
         files.push(file.path);
       })
       .on('end', function() {
-        assert(files.length === 2);
+        assert.equal(files.length, 2);
         assert.equal(files[0], 'b.html');
         assert.equal(files[1], 'y.html');
         assert.equal(files.indexOf('a.html'), -1);
@@ -259,7 +259,7 @@ describe('src()', function() {
         files.push(file.path);
       })
       .on('end', function() {
-        assert(files.length === 1);
+        assert.equal(files.length, 1);
         assert.equal(files[0], 'b.html');
         assert.equal(files.indexOf('a.html'), -1);
         assert.equal(files.indexOf('c.html'), -1);
@@ -279,7 +279,7 @@ describe('src()', function() {
         files.push(file.path);
       })
       .on('end', function() {
-        assert(files.length === 2);
+        assert.equal(files.length, 2);
         assert.equal(files[0], 'b.html');
         assert.equal(files[1], 'y.html');
         assert.equal(files.indexOf('a.html'), -1);
@@ -301,8 +301,8 @@ describe('src()', function() {
       .on('error', done)
       .on('data', function() {})
       .on('end', function() {
-        assert(files.length === 1);
-        assert(files[0] === 'b.html');
+        assert.equal(files.length, 1);
+        assert.equal(files[0], 'b.html');
         done();
       });
   });
