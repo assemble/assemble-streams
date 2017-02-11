@@ -15,6 +15,9 @@ module.exports = function(options) {
       app.define('toStream', appStream(app));
       app.on('view', function(view) {
         viewPlugin.call(view, view);
+        app.handle('onLoad', view, function(err) {
+          if (err) throw err;
+        });
       });
       return collectionPlugin;
     }
