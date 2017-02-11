@@ -1,7 +1,7 @@
 {
   "name": "assemble-streams",
-  "description": "Assemble pipeline plugin for pushing a view collection into a vinyl stream.",
-  "version": "0.7.0",
+  "description": "Assemble pipeline plugin for pushing views into a vinyl stream.",
+  "version": "1.0.0",
   "homepage": "https://github.com/assemble/assemble-streams",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "assemble/assemble-streams",
