@@ -78,7 +78,7 @@ function appStream(app) {
         stream.end();
       }.bind(this));
 
-      return utils.src(stream.pipe(utils.handle.once(this, 'onStream')));
+      return outStream(stream, this);
     }
 
     setImmediate(function() {
@@ -86,7 +86,7 @@ function appStream(app) {
       stream.end();
     });
 
-    return utils.src(stream.pipe(utils.handle.once(this, 'onStream')));
+    return outStream(stream, this);
   };
 }
 
@@ -122,7 +122,7 @@ function collectionStream(collection) {
       stream.end();
     });
 
-    return utils.src(stream.pipe(utils.handle.once(collection, 'onStream')));
+    return outStream(stream, collection);
   };
 }
 
@@ -150,7 +150,7 @@ function viewStream(view) {
       stream.write(item);
       stream.end();
     }, this);
-    return utils.src(stream.pipe(utils.handle.once(view, 'onStream')));
+    return outStream(stream, view);
   };
 }
 
@@ -192,5 +192,4 @@ function filter(key, view, val) {
       return true;
     }
   }
-  return true;
 }
