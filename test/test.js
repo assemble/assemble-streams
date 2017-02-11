@@ -109,6 +109,66 @@ describe('src()', function() {
       });
   });
 
+  it('should emit `app.onStream` and `app.pages.onStream` when using `app.toStream`', function(done) {
+    var files = [];
+    var pages = [];
+    app.onStream(/\.html/, function(file, next) {
+      files.push(file.path);
+      next();
+    });
+
+    app.pages.onStream(/\.html/, function(file, next) {
+      pages.push(file.path);
+      next();
+    });
+
+    app.toStream('pages')
+      .on('error', done)
+      .on('data', function() {})
+      .on('end', function() {
+        assert.equal(files.length, 3);
+        assert.equal(files[0], 'a.html');
+        assert.equal(files[1], 'b.html');
+        assert.equal(files[2], 'c.html');
+
+        assert.equal(pages.length, 3);
+        assert.equal(pages[0], 'a.html');
+        assert.equal(pages[1], 'b.html');
+        assert.equal(pages[2], 'c.html');
+        done();
+      });
+  });
+
+  it('should emit `app.onStream` and `app.pages.onStream` when using `app.pages.toStream`', function(done) {
+    var files = [];
+    var pages = [];
+    app.onStream(/\.html/, function(file, next) {
+      files.push(file.path);
+      next();
+    });
+
+    app.pages.onStream(/\.html/, function(file, next) {
+      pages.push(file.path);
+      next();
+    });
+
+    app.pages.toStream()
+      .on('error', done)
+      .on('data', function() {})
+      .on('end', function() {
+        assert.equal(files.length, 3);
+        assert.equal(files[0], 'a.html');
+        assert.equal(files[1], 'b.html');
+        assert.equal(files[2], 'c.html');
+
+        assert.equal(pages.length, 3);
+        assert.equal(pages[0], 'a.html');
+        assert.equal(pages[1], 'b.html');
+        assert.equal(pages[2], 'c.html');
+        done();
+      });
+  });
+
   it('should pipe a collection', function(done) {
     var files = [];
     app.pages.toStream()
