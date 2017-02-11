@@ -10,23 +10,28 @@
 var utils = require('./utils');
 
 module.exports = function(options) {
-  return function appPlugin(app) {
-    if (!utils.isValid(app, 'assemble-streams')) return appPlugin;
-    app.define('toStream', appStream(app));
+  return function plugin(app) {
+    if (utils.isValid(app, 'assemble-streams')) {
+      app.define('toStream', appStream(app));
+      app.on('view', function(view) {
+        viewPlugin.call(view, view);
+      });
+      return collectionPlugin;
+    }
 
-    return function collectionPlugin(collection) {
-      if (!utils.isValid(collection, 'assemble-streams-collection', ['views', 'collection'])) {
-        return collectionPlugin;
+    function collectionPlugin(collection) {
+      if (utils.isValid(collection, 'assemble-streams', ['collection'])) {
+        collection.define('toStream', collectionStream(app, this));
       }
-      collection.define('toStream', collectionStream(app, this));
+      return viewPlugin;
+    }
 
-      return function viewPlugin(view) {
-        if (!utils.isValid(view, 'assemble-streams-view', ['view', 'item', 'file'])) {
-          return viewPlugin;
-        }
+    function viewPlugin(view) {
+      if (utils.isValid(view, 'assemble-streams', ['item', 'file'])) {
         this.define('toStream', viewStream(app));
-      };
-    };
+      }
+    }
+    return plugin;
   };
 };
 
@@ -46,7 +51,9 @@ module.exports = function(options) {
  */
 
 function appStream(app) {
-  initHandlers(app);
+  if (!hasHandler(app, 'onStream')) {
+    app.handler('onStream');
+  }
 
   return function(name, filterFn) {
     var stream = utils.through.obj();
@@ -58,7 +65,8 @@ function appStream(app) {
     }
 
     var write = writeStream(stream);
-    var views = tryGetViews(this, name);
+    var collection = this[name];
+    var views = collection && collection.views;
 
     if (!views && typeof name !== 'undefined') {
       filterFn = name;
@@ -97,8 +105,10 @@ function appStream(app) {
  * @api public
  */
 
-function collectionStream(app, collection) {
-  initHandlers(collection);
+function collectionStream(collection) {
+  if (!hasHandler(collection, 'onStream')) {
+    collection.handler('onStream');
+  }
 
   return function(filterFn) {
     var stream = utils.through.obj();
@@ -112,7 +122,7 @@ function collectionStream(app, collection) {
       stream.end();
     });
 
-    return utils.src(stream.pipe(utils.handle.once(app, 'onStream')));
+    return utils.src(stream.pipe(utils.handle.once(collection, 'onStream')));
   };
 }
 
@@ -132,58 +142,55 @@ function collectionStream(app, collection) {
  * @api public
  */
 
-function viewStream(app) {
+function viewStream(view) {
   return function() {
     var stream = utils.through.obj();
     stream.setMaxListeners(0);
-    setImmediate(function(view) {
-      stream.write(view);
+    setImmediate(function(item) {
+      stream.write(item);
       stream.end();
     }, this);
-    return utils.src(stream.pipe(utils.handle.once(app, 'onStream')));
+    return utils.src(stream.pipe(utils.handle.once(view, 'onStream')));
   };
-}
-
-function tryGetViews(app, name) {
-  try {
-    return app.getViews(name);
-  } catch (err) {}
-}
-
-function filter(key, view, fn) {
-  if (Array.isArray(fn)) {
-    var len = fn.length;
-    var idx = -1;
-    while (++idx < len) {
-      var name = fn[idx];
-      if (utils.match(name, view)) {
-        return true;
-      }
-    }
-    return false;
-  }
-  if (typeof fn === 'function') {
-    return fn(key, view);
-  }
-  if (typeof fn === 'string') {
-    return utils.match(fn, view);
-  }
-  return true;
 }
 
 function writeStream(stream) {
   return function(views, filterFn) {
     for (var key in views) {
-      if (!filter(key, views[key], filterFn)) {
-        continue;
+      if (filter(key, views[key], filterFn)) {
+        stream.write(views[key]);
       }
-      stream.write(views[key]);
     }
   };
 }
 
-function initHandlers(app) {
-  if (typeof app.handler === 'function' && typeof app.onStream !== 'function') {
-    app.handler('onStream');
+function outStream(stream, instance) {
+  return utils.src(stream.pipe(utils.handle.once(instance, 'onStream')));
+}
+
+function hasHandler(app, name) {
+  return typeof app.handler === 'function' && typeof app[name] === 'function';
+}
+
+function filter(key, view, val) {
+  switch (utils.typeOf(val)) {
+    case 'array':
+      var len = val.length;
+      var idx = -1;
+      while (++idx < len) {
+        var name = val[idx];
+        if (utils.match(name, view)) {
+          return true;
+        }
+      }
+      return false;
+    case 'function':
+      return val(key, view);
+    case 'string':
+      return utils.match(val, view);
+    default: {
+      return true;
+    }
   }
+  return true;
 }

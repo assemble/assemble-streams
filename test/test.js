@@ -125,9 +125,26 @@ describe('src()', function() {
       });
   });
 
+  it('should add `toStream` to a view that is not on a collection', function(done) {
+    var files = [];
+    var view = app.view('foo.bar', {content: 'this is foo'});
+
+    view.toStream()
+      .on('error', done)
+      .on('data', function(view) {
+        files.push(view);
+      })
+      .on('end', function() {
+        assert.equal(files.length, 1);
+        assert.equal(files[0].path, 'foo.bar');
+        done();
+      });
+  });
+
   it('should emit `app.onStream` when using `app.pages.toStream`', function(done) {
     var files = [];
-    app.onStream(/\.html/, function(file, next) {
+
+    app.onStream(/\.html$/, function(file, next) {
       files.push(file.path);
       next();
     });
