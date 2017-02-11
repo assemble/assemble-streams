@@ -1,6 +1,6 @@
 # assemble-streams [![NPM version](https://img.shields.io/npm/v/assemble-streams.svg?style=flat)](https://www.npmjs.com/package/assemble-streams) [![NPM monthly downloads](https://img.shields.io/npm/dm/assemble-streams.svg?style=flat)](https://npmjs.org/package/assemble-streams)  [![NPM total downloads](https://img.shields.io/npm/dt/assemble-streams.svg?style=flat)](https://npmjs.org/package/assemble-streams) [![Linux Build Status](https://img.shields.io/travis/assemble/assemble-streams.svg?style=flat&label=Travis)](https://travis-ci.org/assemble/assemble-streams)
 
-> Assemble pipeline plugin for pushing a view collection into a vinyl stream.
+> Assemble pipeline plugin for pushing views into a vinyl stream.
 
 ## Install
 
