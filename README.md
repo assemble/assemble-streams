@@ -21,7 +21,7 @@ var streams = require('assemble-streams');
 // create your application
 var app = assemble();
 // register the plugin
-app.use(stream());
+app.use(streams());
 
 // use the plugin on app
 app.toStream('pages')
