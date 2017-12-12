@@ -36,7 +36,7 @@ app.pages.getView('home').toStream()
   .pipe(app.dest('site/'));
 ```
 
-See the [tests](./test.js) for more examples.
+See the [tests](./test/test.js) for more examples.
 
 ## API
 
