@@ -21,7 +21,7 @@ var streams = require('assemble-streams');
 // create your application
 var app = assemble();
 // register the plugin
-app.use(stream());
+app.use(streams());
 
 // use the plugin on app
 app.toStream('pages')
@@ -36,7 +36,7 @@ app.pages.getView('home').toStream()
   .pipe(app.dest('site/'));
 ```
 
-See the [tests](./test.js) for more examples.
+See the [tests](./test/test.js) for more examples.
 
 ## API
 
